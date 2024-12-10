@@ -4,19 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
-  <title>ERP-test</title>
+  <title>ERP-dj</title>
 </head>
 <body>
   <!-- 第一个模块 -->
   <div class="module">
-    <p>根据02a表格，生成订单信息</p>
+    <p>01 采购仓库->现存量</p>
     <button id="button_1">点击开始</button>
   </div>
 
   <!-- 第二个模块 -->
   <div class="module">
-    <p>根据02b表格，生成大货订单与任务工单</p>
+    <p>02 现存量->生产工单</p>
     <button id="button_2">点击开始</button>
+  </div>
+
+  <!-- 第三个模块 -->
+  <div class="module">
+    <p>03 成品明细单->现存量</p>
+    <button id="button_3">点击开始</button>
   </div>
 
   <script type="module" src="src/script.bundle.js"></script>
