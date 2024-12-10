@@ -1,130 +1,61 @@
 import { bitable } from '@lark-base-open/js-sdk'
-import { getFieldIdFromMetaByName, getViewIdFromMetaByName } from "./feishuHelp"
+import { getFieldIdFromMetaByName, getViewIdFromMetaByName, copyRecords } from "./feishuHelp"
 
 
-// 01 采购仓库->现存量
-export async function caiGouToXianCun() {
-  console.log('01 采购仓库->现存量');
+export async function xianCunToShengChan() {
+  console.log('02 现存量->生产工单');
 
-  const inputTableName = "采购仓库";
-  const outputTableName = "现存量";
+  const inputTableName = "现存量";
+  const outputTableName = "生产加工单";
   // 1、读取输入、输出表格
   const inputTable = await bitable.base.getTableByName(inputTableName);
-  const inputTableId = inputTable.context[0];
   const outputTable = await bitable.base.getTableByName(outputTableName);
-  const outputTableId = outputTable.context[0];
-  console.log('inputTable:', inputTable, ',  inputTableId:', inputTableId);
-  console.log('outputTable:', outputTable, ',  outputTableId:', outputTableId);
+  console.log('inputTable:', inputTable);
+  console.log('outputTable:', outputTable);
 
   // 2、获取输入、输出表格所有字段名
   const inputFieldMetaList = await inputTable.getFieldMetaList();
   const outputFieldMetaList = await outputTable.getFieldMetaList();
   console.log("inputFieldMetaList: ", inputFieldMetaList);
   console.log("outputFieldMetaList: ", outputFieldMetaList);
-  const stateFieldName = "📌状态";
-  const stateField = await inputTable.getField(stateFieldName);
-  const stateOptions = await stateField.getOptions();
-  console.log("stateFieldName: ", stateFieldName, ",  stateField: ", stateField, ",  stateOptions: ", stateOptions);
 
 
-  // 3、获取输入、输出表格的所有视图信息，获取基础信息视图的id
+  // 3、获取输入表格的所有视图信息，获取基础信息视图的id
   const inputViewMetaList = await inputTable.getViewMetaList();
-  const outputViewMetaList = await outputTable.getViewMetaList();
   console.log("inputViewMetaList: ", inputViewMetaList);
-  console.log("outputViewMetaList: ", outputViewMetaList);
   const inputBaseInfoViewId = getViewIdFromMetaByName(inputViewMetaList, "基础信息");
-  const outputBaseInfoViewId = getViewIdFromMetaByName(outputViewMetaList, "基础信息");
   console.log("inputBaseInfoViewId: ", inputBaseInfoViewId);
-  console.log("outputBaseInfoViewId: ", outputBaseInfoViewId);
-
-
   const inputBaseInfoView = await inputTable.getViewById(inputBaseInfoViewId);
-  const inputRecordIdList = await inputBaseInfoView.getVisibleRecordIdList();
-  console.log("inputRecordIdList: ", inputRecordIdList);
+
+  // 4、获取选中的记录
+  const selectRecordIdList = await inputBaseInfoView.getSelectedRecordIdList();
+  console.log("selectRecordIdList: ", selectRecordIdList);
   
-  // 4、读取待copy的记录
-  let copyRecords = [];
-  let pageToken = "";
-  while(true){
-    // 循环读取
-    let inputRecordsResponse = {};
-    if(pageToken === ""){
-      inputRecordsResponse = await inputTable.getRecords({ pageSize: 100 })
-    }else{
-      inputRecordsResponse = await inputTable.getRecords({ pageSize: 100, pageToken})
-    }
-    console.log('inputRecordsResponse:', inputRecordsResponse)
-    const inputRecords = inputRecordsResponse.records
-
-    // 遍历所有Records
-    for (const record of allRecords) {
-      console.log(`record=`, record);
-      const recordId = record.recordId;
-      const recordFields = record.fields;
-
-      const stateValue = await stateField.getValue(recordId);
-      console.log("stateValue:", stateValue);
-      if(stateValue && stateValue.text === "已同步"){
-        continue;
-      }else{
-        copyRecords.push(record);
-        // 1、更新状态
-        const res = await stateField.setValue(recordId, stateOptions[1].id);
-        console.log("setRecord res:", res);
-      }
-    }
-
-    // 读取完成
-    if(inputRecordsResponse.hasMore){
-      if(inputRecordsResponse.pageToken){
-        pageToken = inputRecordsResponse.pageToken;
-      }else{
-        break;
-      }
-    }else{
-      console.log("read all finished");
-      break;
-    }
+  // 4、读取待剪切的记录
+  const cutRecords = [];
+  // 遍历所有RecordsId
+  for (const recordId of selectRecordIdList) {
+    console.log(`recordId=`, recordId);
+    const record = await inputTable.getRecordById(recordId);
+    cutRecords.push(cutRecords[i]);
+    const res = await inputTable.deleteRecord(recordId); // 删除记录
+    console.log("deleteRecord, res: ", res);
   }
+
+  // 5、写入到输出表格
+  if(cutRecords.length > 0){
+    console.log("cutRecords: ", cutRecords);
+    const dstRecords = copyRecords(inputFieldMetaList, outputFieldMetaList, cutRecords);
+    await outputTable.addRecords(dstRecords);
+  }
+
   return
 
-  for (let i = 0; i < allRecords.length; i++) {
-    console.log(`allRecords[${i}]=`, allRecords[i])
-    const recordFields = allRecords[i].fields
-    if(recordFields[field_02a_1.id]) {
-      productIdList.push(recordFields[field_02a_1.id][0].text)
-    }
-    if(recordFields[field_02a_2.id]) {
-      colorList.push(recordFields[field_02a_2.id][0].text)
-    }
-    if(recordFields[field_02a_3.id]) {
-      sizeList.push(recordFields[field_02a_3.id][0].text)
-    }
-    if(recordFields[field_02a_4.id]) {
-      numPerBagList.push(recordFields[field_02a_4.id])
-    }
-    if(recordFields[field_02a_5.id]) {
-      remaindNumList.push(recordFields[field_02a_5.id])
-    }
-  }
-
-  return;
 
 
-  // 3、
-  //遍历输入表格的所有记录的ID。 
-  const recordIdList = await inputTable.getRecordIdList();
-  // for (const recordId of recordIdList) {
-    // const cellString = await table.getCellString(textField?.id!, recordIdList[i]!);
-  //   if (cellString?.includes(findText)) {
-  //     const newText = cellString.replaceAll(findText, replaceText);
-  //     //更新单元格的值 Update the value of the specified fieldId and recordId
-  //     await table.setCellValue(textField?.id!, recordIdList[i]!, [{
-  //       type: IOpenSegmentType.Text,
-  //       text: newText,
-  //     }]);
-  //   }
-  // }
+
+
+ 
 
 
   //获取当前所选的信息。 Get the current selection

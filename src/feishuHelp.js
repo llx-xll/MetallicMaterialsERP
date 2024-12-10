@@ -47,14 +47,22 @@ export function matchFields(srcFieldMateList, dstFieldMateList){
   }
 }
 
-export function copyRecords(srcFieldMateList, dstFieldMateList, srcRecords){
+export function copyRecordsToOtherTable(srcFieldMateList, dstFieldMateList, srcRecords){
   let outRecords = [];
   // 获取字段id对应关系
   const fieldIdMatch = matchFields(srcFieldMateList, dstFieldMateList);
+  console.log("fieldIdMatch: ", fieldIdMatch);
   // 执行copy赋值
   for(const record of srcRecords){
+    const dstFields = {};
     const srcFields = record.fields;
-    
+    for(const fieldId in srcFields){
+      const dstFieldId = fieldIdMatch[fieldId];
+      if(dstFieldId){
+        dstFields[dstFieldId] = srcFields[fieldId];
+      }
+    }
+    outRecords.push(dstFields);
   }
-
+  return outRecords;
 }
