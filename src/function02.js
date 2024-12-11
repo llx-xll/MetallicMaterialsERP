@@ -1,5 +1,5 @@
 import { bitable } from '@lark-base-open/js-sdk'
-import { getFieldIdFromMetaByName, getViewIdFromMetaByName, copyRecords } from "./feishuHelp"
+import { getFieldIdFromMetaByName, getViewIdFromMetaByName, copyRecordsToOtherTable } from "./feishuHelp"
 
 
 export async function xianCunToShengChan() {
@@ -28,6 +28,8 @@ export async function xianCunToShengChan() {
   const inputBaseInfoView = await inputTable.getViewById(inputBaseInfoViewId);
 
   // 4、获取选中的记录
+  const inputRecordIdList = await inputTable.getRecordIdList();
+  console.log("inputRecordIdList: ", inputRecordIdList);
   const selectRecordIdList = await inputBaseInfoView.getSelectedRecordIdList();
   console.log("selectRecordIdList: ", selectRecordIdList);
   
@@ -37,7 +39,8 @@ export async function xianCunToShengChan() {
   for (const recordId of selectRecordIdList) {
     console.log(`recordId=`, recordId);
     const record = await inputTable.getRecordById(recordId);
-    cutRecords.push(cutRecords[i]);
+    console.log("record: ", record);
+    cutRecords.push(record);
     const res = await inputTable.deleteRecord(recordId); // 删除记录
     console.log("deleteRecord, res: ", res);
   }
@@ -45,7 +48,7 @@ export async function xianCunToShengChan() {
   // 5、写入到输出表格
   if(cutRecords.length > 0){
     console.log("cutRecords: ", cutRecords);
-    const dstRecords = copyRecords(inputFieldMetaList, outputFieldMetaList, cutRecords);
+    const dstRecords = copyRecordsToOtherTable(inputFieldMetaList, outputFieldMetaList, cutRecords);
     await outputTable.addRecords(dstRecords);
   }
 

@@ -91,7 +91,8 @@ export async function caiGouToXianCun() {
     console.log("copyRecords: ", copyRecords);
     const dstRecords = copyRecordsToOtherTable(inputFieldMetaList, outputFieldMetaList, copyRecords);
     console.log("dstRecords: ", dstRecords);
-    await outputTable.addRecords(dstRecords);
+    const res = await outputTable.addRecords(dstRecords);
+    console.log("addRecords res:", res)
   }
 
   return

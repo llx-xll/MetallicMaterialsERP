@@ -34,6 +34,7 @@ export function getViewIdFromMetaByName(viewMateList, viewName){
 // 两个tabel的字段匹配
 export function matchFields(srcFieldMateList, dstFieldMateList){
   let fieldIdSrcToDst = {};
+  const noCopyTypeList = [20, 21];
   for(const srcFieldMate of srcFieldMateList){
     const srcId = srcFieldMate.id;
     const srcType = srcFieldMate.type;
@@ -41,10 +42,13 @@ export function matchFields(srcFieldMateList, dstFieldMateList){
     const dstField = getFieldFromMetaByName(dstFieldMateList, srcName); // 按名字查找
     if(dstField){ 
       if(dstField.type === srcType){
-        fieldIdSrcToDst[srcId] = dstField.id;
+        if(!noCopyTypeList.includes(dstField.type)){
+          fieldIdSrcToDst[srcId] = dstField.id;
+        }
       }
     }
   }
+  return fieldIdSrcToDst;
 }
 
 export function copyRecordsToOtherTable(srcFieldMateList, dstFieldMateList, srcRecords){
@@ -62,7 +66,7 @@ export function copyRecordsToOtherTable(srcFieldMateList, dstFieldMateList, srcR
         dstFields[dstFieldId] = srcFields[fieldId];
       }
     }
-    outRecords.push(dstFields);
+    outRecords.push({fields: dstFields});
   }
   return outRecords;
 }

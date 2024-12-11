@@ -1,5 +1,5 @@
 import { bitable } from '@lark-base-open/js-sdk'
-import { getFieldIdFromMetaByName, getViewIdFromMetaByName, copyRecords } from "./feishuHelp"
+import { getFieldIdFromMetaByName, getViewIdFromMetaByName, copyRecordsToOtherTable } from "./feishuHelp"
 
 
 
@@ -89,7 +89,7 @@ export async function chengPinToXianCun() {
   // 5、写入到输出表格
   if(copyRecords.length > 0){
     console.log("copyRecords: ", copyRecords);
-    const dstRecords = copyRecords(inputFieldMetaList, outputFieldMetaList, copyRecords);
+    const dstRecords = copyRecordsToOtherTable(inputFieldMetaList, outputFieldMetaList, copyRecords);
     await outputTable.addRecords(dstRecords);
   }
 
