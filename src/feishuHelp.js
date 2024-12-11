@@ -34,7 +34,8 @@ export function getViewIdFromMetaByName(viewMateList, viewName){
 // 两个tabel的字段匹配
 export function matchFields(srcFieldMateList, dstFieldMateList){
   let fieldIdSrcToDst = {};
-  const noCopyTypeList = [20, 21];
+  // const noCopyTypeList = [20, 21];
+  const noCopyTypeList = [];
   for(const srcFieldMate of srcFieldMateList){
     const srcId = srcFieldMate.id;
     const srcType = srcFieldMate.type;
