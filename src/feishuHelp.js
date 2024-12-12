@@ -34,8 +34,6 @@ export function getViewIdFromMetaByName(viewMateList, viewName){
 // 两个tabel的字段匹配
 export function matchFields(srcFieldMateList, dstFieldMateList){
   let fieldIdSrcToDst = {};
-  // const noCopyTypeList = [20, 21];
-  const noCopyTypeList = [];
   for(const srcFieldMate of srcFieldMateList){
     const srcId = srcFieldMate.id;
     const srcType = srcFieldMate.type;
@@ -43,9 +41,7 @@ export function matchFields(srcFieldMateList, dstFieldMateList){
     const dstField = getFieldFromMetaByName(dstFieldMateList, srcName); // 按名字查找
     if(dstField){ 
       if(dstField.type === srcType){
-        if(!noCopyTypeList.includes(dstField.type)){
-          fieldIdSrcToDst[srcId] = dstField.id;
-        }
+        fieldIdSrcToDst[srcId] = {id:dstField.id, type:dstField.type};
       }
     }
   }
@@ -62,9 +58,17 @@ export function copyRecordsToOtherTable(srcFieldMateList, dstFieldMateList, srcR
     const dstFields = {};
     const srcFields = record.fields;
     for(const fieldId in srcFields){
-      const dstFieldId = fieldIdMatch[fieldId];
-      if(dstFieldId){
-        dstFields[dstFieldId] = srcFields[fieldId];
+      const dstFieldInfo = fieldIdMatch[fieldId];
+      if(dstFieldInfo){
+        switch(dstFieldInfo.type){
+          case 20: // “公式”
+            break;
+          case 21: // “双向关联”
+            dstFields[dstFieldInfo.id] = {recordIds: srcFields[fieldId].recordIds};
+            break;
+          default:
+            dstFields[dstFieldInfo.id] = srcFields[fieldId];
+        }
       }
     }
     outRecords.push({fields: dstFields});
